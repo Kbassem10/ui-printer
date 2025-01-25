@@ -24,12 +24,14 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
+        error = "No file was selected"
+        return render_template("index.html", error=error)
 
     file = request.files['file']
 
     if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
+        error = "No file was selected"
+        return render_template("index.html", error=error)
 
     if file and allowed_file(file.filename):
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
@@ -44,11 +46,14 @@ def upload_file():
         # Print the file with the specified settings
         try:
             print_file(filepath, copies, page_range, orientation, paper_size)
-            return jsonify({"message": "File uploaded and printed successfully!"}), 200
+            done = "File uploaded and printed successfully!"
+            return render_template("index.html", done=done)
         except Exception as e:
-            return jsonify({"error": f"Failed to print file: {str(e)}"}), 500
+            error = f"Failed to print file: {str(e)}"
+            return render_template("index.html", error=error)
     else:
-        return jsonify({"error": "File type not allowed"}), 400
+        error = "File type not allowed"
+        return render_template("index.html", error=error)
 
 def print_file(filepath, copies, page_range, orientation, paper_size):
     # Build the `lp` command with the specified settings
